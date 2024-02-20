@@ -26,24 +26,17 @@ namespace PaySpace.Calculator.Services.Calculators
             foreach ( var bracket  in calcualtionSettings)
             {
 
-               
-            
-               
-                if (taxableIncome <= 0)
-                    break;
-                if(bracket.To == null)
+
+                if (income <= bracket.From)
                 {
-                    bracket.To = taxableIncome;
-                    previousbracketMaxValue = 0;
-                }
-
-                decimal bracketTaxableAmount = Math.Min((decimal)bracket.To, taxableIncome) - previousbracketMaxValue;
-                if (bracketTaxableAmount <= 0)
                     break;
+                }
+               // bracket.To = bracket.To + 1;
+                decimal incomeInSlab = bracket.To.HasValue ? Math.Min(income, bracket.To.Value) - bracket.From : income - bracket.From;
+                tax += Convert.ToDecimal(incomeInSlab * (bracket.Rate / 100));
 
-                tax += bracketTaxableAmount * bracket.Rate/100;
-                taxableIncome -= bracketTaxableAmount;
-                previousbracketMaxValue = Convert.ToDecimal(bracket.To);
+
+           
             }
 
             return Task.FromResult(new CalculateResult()

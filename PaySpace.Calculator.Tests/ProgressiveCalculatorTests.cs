@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
 using PaySpace.Calculator.Data.Models;
 using PaySpace.Calculator.Services;
 using PaySpace.Calculator.Services.Abstractions;
@@ -9,14 +10,30 @@ namespace PaySpace.Calculator.Tests
     [TestFixture]
     internal sealed class ProgressiveCalculatorTests
     {
-        private  ICalculatorSettingsService _calculatorSettingsService;
+        private PaySpace.Calculator.Web.Services.CalculatorHttpService httpService;
+        private IConfiguration _configuration;
 
 
         [SetUp]
-        public void Setup(ICalculatorSettingsService calculatorSettingsService)
+        public void Setup()
         {
-            _calculatorSettingsService = calculatorSettingsService;
-           
+            try
+            {
+                _configuration = new ConfigurationBuilder()
+              .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+              .Build();
+            }
+            catch (Exception)
+            {
+                _configuration = new ConfigurationBuilder()
+                    .AddInMemoryCollection(new[]
+                    {
+                        new KeyValuePair<string, string>("CalculatorSettings:ApiUrl", "https://localhost:7119")
+                    })
+                    .Build();
+            }
+            httpService = new Web.Services.CalculatorHttpService(_configuration);
+
         }
 
        [TestCase(-1, 0)]
@@ -30,9 +47,20 @@ namespace PaySpace.Calculator.Tests
 
         public async Task Calculate_Should_Return_Expected_Tax(decimal income, decimal expectedTax)
         {
-            var calcualtionSettings = _calculatorSettingsService.GetSettingsAsync().Result;
-            var result = new PaySpace.Calculator.Services.Calculators.ProgressiveCalculator(_calculatorSettingsService);
-            Assert.IsTrue(result.CalculateAsync(income).Result.Tax.Equals(expectedTax));
+
+            // Arrange
+            Web.Services.Models.CalculateRequest request = new Web.Services.Models.CalculateRequest()
+            {
+                Income = income,
+                PostalCode = "7441"
+            };
+
+            // Act
+            Web.Services.Models.CalculateResult result = await httpService.CalculateTaxAsync(request);
+
+            // Assert
+            Assert.AreEqual(Convert.ToDouble(expectedTax), Convert.ToDouble(result.Tax), 1);
+        
         }
     }
 }
