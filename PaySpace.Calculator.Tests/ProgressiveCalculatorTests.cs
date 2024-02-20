@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using PaySpace.Calculator.Data.Models;
 using PaySpace.Calculator.Services;
 using PaySpace.Calculator.Services.Abstractions;
 using PaySpace.Calculator.Services.Calculators;
@@ -12,7 +13,11 @@ namespace PaySpace.Calculator.Tests
 
 
         [SetUp]
-       
+        public void Setup(ICalculatorSettingsService calculatorSettingsService)
+        {
+            _calculatorSettingsService = calculatorSettingsService;
+           
+        }
 
        [TestCase(-1, 0)]
         [TestCase(50, 5)]
@@ -25,7 +30,7 @@ namespace PaySpace.Calculator.Tests
 
         public async Task Calculate_Should_Return_Expected_Tax(decimal income, decimal expectedTax)
         {
-
+            var calcualtionSettings = _calculatorSettingsService.GetSettingsAsync().Result;
             var result = new PaySpace.Calculator.Services.Calculators.ProgressiveCalculator(_calculatorSettingsService);
             Assert.IsTrue(result.CalculateAsync(income).Result.Tax.Equals(expectedTax));
         }

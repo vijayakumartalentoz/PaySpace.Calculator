@@ -16,5 +16,13 @@ namespace PaySpace.Calculator.Services
                 return context.Set<CalculatorSetting>().AsNoTracking().Where(_ => _.Calculator == calculatorType).ToListAsync();
             })!;
         }
+
+        public Task<List<CalculatorSetting>> GetSettingsAsync()
+        {
+            return memoryCache.GetOrCreateAsync($"", entry =>
+            {
+                return context.Set<CalculatorSetting>().AsNoTracking().ToListAsync();
+            })!;
+        }
     }
 }

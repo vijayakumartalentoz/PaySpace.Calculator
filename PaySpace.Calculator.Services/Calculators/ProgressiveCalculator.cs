@@ -15,6 +15,9 @@ namespace PaySpace.Calculator.Services.Calculators
         }
             public Task<CalculateResult> CalculateAsync(decimal income)
         {
+     
+
+           
             decimal tax = 0m;
             decimal taxableIncome = income;
             decimal previousbracketMaxValue = 0;
@@ -38,7 +41,7 @@ namespace PaySpace.Calculator.Services.Calculators
                 if (bracketTaxableAmount <= 0)
                     break;
 
-                tax += bracketTaxableAmount * (bracket.Rate/100);
+                tax += bracketTaxableAmount * bracket.Rate/100;
                 taxableIncome -= bracketTaxableAmount;
                 previousbracketMaxValue = Convert.ToDecimal(bracket.To);
             }
