@@ -17,16 +17,21 @@ namespace PaySpace.Calculator.Services.Calculators
         {
             decimal tax = 0m;
             decimal taxableIncome = income;
+            decimal previousbracketMaxValue = 0;
             // Iterate through tax brackets and calculate tax
             var calcualtionSettings = _calculatorSettingsService.GetSettingsAsync(CalculatorType.Progressive).Result;
             foreach ( var bracket  in calcualtionSettings)
             {
 
                
-                decimal previousbracketMaxValue = 0;
+            
                
                 if (taxableIncome <= 0)
                     break;
+                if(bracket.To == null)
+                {
+                    bracket.To = taxableIncome;
+                }
 
                 decimal bracketTaxableAmount = Math.Min((decimal)bracket.To, taxableIncome) - previousbracketMaxValue;
                 if (bracketTaxableAmount <= 0)
