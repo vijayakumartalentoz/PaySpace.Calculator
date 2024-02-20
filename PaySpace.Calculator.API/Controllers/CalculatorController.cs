@@ -7,7 +7,7 @@ using PaySpace.Calculator.Data.Models;
 using PaySpace.Calculator.Services.Abstractions;
 using PaySpace.Calculator.Services.Exceptions;
 using PaySpace.Calculator.Services.Models;
- 
+
 
 
 namespace PaySpace.Calculator.API.Controllers
@@ -17,7 +17,7 @@ namespace PaySpace.Calculator.API.Controllers
     public sealed class CalculatorController(
         ILogger<CalculatorController> logger,
         IHistoryService historyService,
-        IMapper mapper,IPostalCodeService postalCodeService, ICalculatorSettingsService calculatorSettingsService )
+        IMapper mapper, IPostalCodeService postalCodeService, ICalculatorSettingsService calculatorSettingsService)
         : ControllerBase
     {
         [HttpPost("calculate-tax")]
@@ -25,30 +25,28 @@ namespace PaySpace.Calculator.API.Controllers
         {
             try
             {
-                var actMap = new Dictionary<CalculatorType, dynamic>
+                var actionMapping = new Dictionary<CalculatorType, dynamic>
                 {
-                    {CalculatorType.Progressive,     }
+                    {CalculatorType.Progressive,   new PaySpace.Calculator.Services.Calculators.ProgressiveCalculator(calculatorSettingsService) },
+                    {CalculatorType.FlatValue,   new PaySpace.Calculator.Services.Calculators.FlatValueCalculator(calculatorSettingsService) },
+                    {CalculatorType.FlatRate,   new PaySpace.Calculator.Services.Calculators.FlatRateCalculator(calculatorSettingsService)   }
                  };
-                var result = await postalCodeService.CalculatorTypeAsync(request.PostalCode);
-
-                decimal tax = 0;
-
-                if(actMap.TryGetValue(result.Value, out var action))
+                var resultcalculatorType = await postalCodeService.CalculatorTypeAsync(request.PostalCode);
+                var resultCalculator = new CalculateResult();
+                if (actionMapping.TryGetValue(resultcalculatorType.Value, out var resultcalculator))
                 {
-                    tax = action.Calculate;
-                    
-
+                    resultCalculator = resultcalculator.CalculateAsync(request.Income).Result;
                 }
 
                 await historyService.AddAsync(new CalculatorHistory
                 {
-                    //Tax = result.Tax,
-                   // Calculator = result.Calculator,
+                    Tax = resultCalculator.Tax,
+                    Calculator = resultCalculator.Calculator,
                     PostalCode = request.PostalCode ?? "Unknown",
                     Income = request.Income
                 });
 
-                return this.Ok(mapper.Map<CalculateResultDto>(result));
+                return this.Ok(mapper.Map<CalculateResultDto>(resultCalculator));
             }
             catch (CalculatorException e)
             {
