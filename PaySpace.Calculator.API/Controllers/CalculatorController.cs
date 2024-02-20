@@ -63,5 +63,13 @@ namespace PaySpace.Calculator.API.Controllers
 
             return this.Ok(mapper.Map<List<CalculatorHistoryDto>>(history));
         }
+
+        [HttpGet("postalcode")]
+        public async Task<ActionResult<List<PostalCode>>>  PostalCodes()
+        {
+            var postalCodes = await postalCodeService.GetPostalCodesAsync();
+
+            return this.Ok(mapper.Map<List<PostalCodeDto>>(postalCodes));
+        }
     }
 }
