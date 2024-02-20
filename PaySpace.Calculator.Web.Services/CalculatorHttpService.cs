@@ -47,7 +47,7 @@ namespace PaySpace.Calculator.Web.Services
         {
             string apiUrl = _configuration["CalculatorSettings:ApiUrl"].ToString();
             HttpClient httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(apiUrl + "/" + "api/Calculator/calcuate-tax");
+            var response = await httpClient.PostAsJsonAsync(apiUrl + "/" + "api/Calculator/calculate-tax", calculationRequest);
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"Cannot fetch tax, status code: {response.StatusCode}");

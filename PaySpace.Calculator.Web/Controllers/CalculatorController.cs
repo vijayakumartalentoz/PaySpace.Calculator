@@ -58,7 +58,7 @@ namespace PaySpace.Calculator.Web.Controllers
             SelectList selectedList = new SelectList(postalCodes.Select(pc => new SelectListItem
             {
                 Text = pc.Code,
-                Value = pc.Id.ToString()
+                Value = pc.Code.ToString()
             }), "Value", "Text"); ; 
             return new CalculatorViewModel
             {

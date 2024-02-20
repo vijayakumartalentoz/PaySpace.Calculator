@@ -23,5 +23,5 @@
         <label asp-for="Income">Income</label>
         <input type="number" step="0.01" class="form-control" asp-for="Income" />
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary" asp-controller="Calculator" asp-action="Index">Submit</button>
 </form>
