@@ -31,6 +31,7 @@ namespace PaySpace.Calculator.Services.Calculators
                 if(bracket.To == null)
                 {
                     bracket.To = taxableIncome;
+                    previousbracketMaxValue = 0;
                 }
 
                 decimal bracketTaxableAmount = Math.Min((decimal)bracket.To, taxableIncome) - previousbracketMaxValue;

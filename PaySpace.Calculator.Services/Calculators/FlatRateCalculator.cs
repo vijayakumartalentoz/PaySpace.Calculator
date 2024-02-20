@@ -24,6 +24,8 @@ namespace PaySpace.Calculator.Services.Calculators
                 Calculator = CalculatorType.FlatValue,
                 Tax = tax,
             });
+
+
         }
     }
 }

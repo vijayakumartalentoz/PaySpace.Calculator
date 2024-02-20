@@ -1,16 +1,20 @@
 ﻿using NUnit.Framework;
+using PaySpace.Calculator.Services;
+using PaySpace.Calculator.Services.Abstractions;
+using PaySpace.Calculator.Services.Calculators;
 
 namespace PaySpace.Calculator.Tests
 {
     [TestFixture]
     internal sealed class ProgressiveCalculatorTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
+        private  ICalculatorSettingsService _calculatorSettingsService;
 
-        [TestCase(-1, 0)]
+
+        [SetUp]
+       
+
+       [TestCase(-1, 0)]
         [TestCase(50, 5)]
         [TestCase(8350.1, 835.01)]
         [TestCase(8351, 835)]
@@ -18,13 +22,12 @@ namespace PaySpace.Calculator.Tests
         [TestCase(82251, 16749.60)]
         [TestCase(171550, 41753.32)]
         [TestCase(999999, 327681.79)]
+
         public async Task Calculate_Should_Return_Expected_Tax(decimal income, decimal expectedTax)
         {
-            // Arrange
 
-            // Act
-
-            // Assert
+            var result = new PaySpace.Calculator.Services.Calculators.ProgressiveCalculator(_calculatorSettingsService);
+            Assert.IsTrue(result.CalculateAsync(income).Result.Tax.Equals(expectedTax));
         }
     }
 }
